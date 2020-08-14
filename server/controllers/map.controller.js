@@ -6,7 +6,6 @@ module.exports.getDistance = (req, res)=>{
     const url = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=' + address1 + '&destinations=' + address2 + '&key=' + process.env.GOOGLE_MAPS_API_KEY + '&departure_time=now'
     Axios.get(url)
         .then( response =>{
-            console.log(response.data);
             res.json({
                 distance: response.data.rows[0].elements[0].distance,
                 duration: response.data.rows[0].elements[0].duration,
@@ -16,4 +15,46 @@ module.exports.getDistance = (req, res)=>{
         .catch( err => {
             console.log(err);
         });
+}
+
+module.exports.getGeocode = (req, res) =>{
+    const address = req.params.address;
+    const url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + address + "&key=" + process.env.GOOGLE_MAPS_API_KEY;
+    Axios.get(url)
+        .then(response =>{
+            res.json({
+                lat: response.data.results[0].geometry.location.lat,
+                long: response.data.results[0].geometry.location.lng
+            })
+        })
+}
+
+module.exports.getPlaces = async (req, res) =>{
+    const address = req.params.address;
+    const coord = await getGeocode(address);
+    const radius = req.params.radius;
+    const keyword = req.params.keyword;
+    const url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + coord.lat + "," + coord.long + "&radius=" + radius + "&keyword=" + keyword + "&key=" + process.env.GOOGLE_MAPS_API_KEY
+    Axios.get(url)
+        .then(response => {
+            res.json(response.data);
+        })
+        .catch(err =>{
+            res.json(err);
+        })
+}
+
+async function getGeocode(address){
+    const url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + address + "&key=" + process.env.GOOGLE_MAPS_API_KEY;
+    try{
+        let response = await Axios.get(url);
+        if(response.data.results[0] === undefined){
+            console.log("Unable to find location: ", response.data);
+            return;
+        }
+        let coordinates = {lat: response.data.results[0].geometry.location.lat, long: response.data.results[0].geometry.location.lng};
+        return coordinates;
+    } catch(err){
+        console.log(err);
+    }
 }
