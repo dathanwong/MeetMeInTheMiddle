@@ -1,20 +1,11 @@
 const { default: Axios } = require("axios");
 
-module.exports.getDistance = (req, res)=>{
+module.exports.getDistance = async (req, res)=>{
     const address1 = req.params.address1;
     const address2 = req.params.address2;
-    const url = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=' + address1 + '&destinations=' + address2 + '&key=' + process.env.GOOGLE_MAPS_API_KEY + '&departure_time=now'
-    Axios.get(url)
-        .then( response =>{
-            res.json({
-                distance: response.data.rows[0].elements[0].distance,
-                duration: response.data.rows[0].elements[0].duration,
-                duration_in_traffic: response.data.rows[0].elements[0].duration_in_traffic
-            })
-        })
-        .catch( err => {
-            console.log(err);
-        });
+    let output = await getDistance(address1, address2)
+    console.log("Output", output);
+    res.json(output);
 }
 
 module.exports.getGeocode = (req, res) =>{
@@ -30,6 +21,32 @@ module.exports.getPlaces = async (req, res) =>{
     const keyword = req.params.keyword;
     let places = await getPlaces(address, radius, keyword);
     res.json(places);
+}
+
+module.exports.getPotentialPlaces = async(req, res) =>{
+    const address1 = req.params.address1;
+    const address2 = req.params.address2;
+    const keyword = req.params.keyword;
+
+}
+
+//returns a json object with the distance in meters between the two destinations, and the duration in seconds
+async function getDistance(address1, address2){
+    const url = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=' + address1 + '&destinations=' + address2 + '&key=' + process.env.GOOGLE_MAPS_API_KEY + '&departure_time=now'
+    try{
+        let response = await Axios.get(url);
+        console.log(response.status);
+        if(response.status === 200){
+            console.log(response.data.rows[0].elements[0]);
+            return {
+                distance: response.data.rows[0].elements[0].distance.value, //In meters
+                duration: response.data.rows[0].elements[0].duration.value, //In seconds
+                duration_in_traffic: response.data.rows[0].elements[0].duration_in_traffic.value //In seconds
+            }
+        }
+    }catch(err){
+        console.log(err);
+    }
 }
 
 async function getGeocode(address){
@@ -58,4 +75,17 @@ async function getPlaces(address, radius, keyword){
         console.log("GetPlaces: Unable to get places");
         return null;
     }
+}
+
+async function comparePlaces(places1, places2){
+    let allPlaces = {};
+    let output = [];
+    for(let place in places){
+        if(allPlaces.hasOwnProperty(place.placeId)){
+            output.push(place);
+        }else{
+            allPlaces[place.placeId] = 1;
+        }
+    }
+    return output;
 }
