@@ -29,13 +29,24 @@ module.exports.getPotentialPlaces = async(req, res) =>{
     const address2 = req.params.address2;
     const keyword = req.params.keyword;
     let distanceValues = await getDistance(address1, address2);
+    let coord1 = await getGeocode(address1);
+    let coord2 = await getGeocode(address2);
     let radius = distanceValues.distance/2 + additionalDistance;
     //Get all places in range for address 1 and address 2
     let places1 = await getPlaces(address1, radius, keyword);
     let places2 = await getPlaces(address2, radius, keyword);
     //Get the places that overlap for both
     let overlap = comparePlaces(places1, places2);
-    res.json(overlap);
+    //Create returned object
+    const output = {
+        coord1: coord1,
+        coord2: coord2,
+        radius: radius,
+        places1: places1,
+        places2: places2,
+        overlap: overlap
+    }
+    res.json(output);
 }
 
 //returns a json object with the distance in meters between the two destinations, and the duration in seconds
@@ -62,7 +73,7 @@ async function getGeocode(address){
         if(response.status !== 200){
             return;
         }
-        let coordinates = {lat: response.data.results[0].geometry.location.lat, long: response.data.results[0].geometry.location.lng};
+        let coordinates = {lat: response.data.results[0].geometry.location.lat, lng: response.data.results[0].geometry.location.lng};
         return coordinates;
     } catch(err){
         console.log(err);
@@ -71,7 +82,7 @@ async function getGeocode(address){
 
 async function getPlaces(address, radius, keyword){
     const coord = await getGeocode(address);
-    let url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + coord.lat + "," + coord.long + "&radius=" + radius + "&keyword=" + keyword + "&key=" + process.env.GOOGLE_MAPS_API_KEY
+    let url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + coord.lat + "," + coord.lng + "&radius=" + radius + "&keyword=" + keyword + "&key=" + process.env.GOOGLE_MAPS_API_KEY
     let allPlaces = [];
     let places = await Axios.get(url);
     let token = places.data.next_page_token;
