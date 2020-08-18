@@ -32,17 +32,23 @@ module.exports.getPotentialPlaces = async(req, res) =>{
         let coord1 = await getGeocode(address1);
         let coord2 = await getGeocode(address2);
         let radius = 20000;
-        //Get all places in range for address 1 and address 2
+        //Get all places in radius of the center point between addresses
         let places = await getPlaces(getCenterCoord(coord1, coord2), radius, keyword);
         //Get the distances to all the potential places from each address
         let distances = await getDistances(coord1, coord2, places);
+        //Combine places with distances into one object
+        for(let i = 0; i < places.length; i++){
+            places[i].origins = distances.origins;
+            places[i].address = distances.destinations[i];
+            places[i].distance_from_origin1 = distances.distance_from_origin1[i];
+            places[i].distance_from_origin2 = distances.distance_from_origin2[i];
+        }
         //Create returned object
         const output = {
             coord1: coord1,
             coord2: coord2,
             radius: radius,
-            places: places,
-            distances: distances
+            places: places
         }
         res.json(output);
     }catch(err){
