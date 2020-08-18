@@ -24,10 +24,12 @@ module.exports.getPlaces = async (req, res) =>{
 
 module.exports.getPotentialPlaces = async(req, res) =>{
     //Set up parameters
-    const additionalDistance = 1000; //Sets the overlap distance between the addresses
     const address1 = req.params.address1;
     const address2 = req.params.address2;
     const keyword = req.params.keyword;
+    const additionalDistance = 10000; //Sets the overlap distance between the addresses
+    let maxDistance = await getDistance(address1, address2);
+    maxDistance = maxDistance.distance/2 + additionalDistance;
     try{
         let coord1 = await getGeocode(address1);
         let coord2 = await getGeocode(address2);
@@ -47,8 +49,8 @@ module.exports.getPotentialPlaces = async(req, res) =>{
         const output = {
             coord1: coord1,
             coord2: coord2,
-            radius: radius,
-            places: places
+            radius: maxDistance,
+            places: filterPlacesByDistance(places, maxDistance)
         }
         res.json(output);
     }catch(err){
@@ -75,6 +77,20 @@ async function getDistance(address1, address2){
     }catch(err){
         console.log(err);
     }
+}
+
+//returns a new array with the places that are less than the max distance away from both locations
+function filterPlacesByDistance(places, maxDistance){
+    let output = [];
+    const windowSize = 20000;
+    for(let i = 0; i < places.length; i++){
+        const dist1 = places[i].distance_from_origin1.distance.value;
+        const dist2 = places[i].distance_from_origin2.distance.value;
+        if(dist1-(windowSize/2) < dist2 && dist1+(windowSize/2) > dist2){
+            output.push(places[i]);
+        }
+    }
+    return output;
 }
 
 async function getGeocode(address){
@@ -119,7 +135,6 @@ async function getDistances(coord1, coord2, places){
         if(i%23 === 0 || i === places.length-1){
             let url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=" + origins + "&destinations=" + destinations + "&key=" + process.env.GOOGLE_MAPS_API_KEY;
             try{
-                console.log(url);
                 let response = await Axios.get(url);
                 originAddresses = response.data.origin_addresses;
                 destinationAddresses.push(...response.data.destination_addresses);
