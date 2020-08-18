@@ -35,15 +35,14 @@ module.exports.getPotentialPlaces = async(req, res) =>{
         //Get all places in range for address 1 and address 2
         let places = await getPlaces(getCenterCoord(coord1, coord2), radius, keyword);
         //Get the distances to all the potential places from each address
-        //let distances = await getDistances(address1, address2, places);
+        let distances = await getDistances(coord1, coord2, places);
         //Create returned object
         const output = {
             coord1: coord1,
             coord2: coord2,
             radius: radius,
             places: places,
-            //overlap: overlap,
-            //distances: distances
+            distances: distances
         }
         res.json(output);
     }catch(err){
@@ -102,12 +101,13 @@ async function getPlaces(coord, radius, keyword){
     return allPlaces;
 }
 
-async function getDistances(address1, address2, places){
-    const coord1 = await getGeocode(address1);
-    const coord2 = await getGeocode(address2);
+async function getDistances(coord1, coord2, places){
     let origins = coord1.lat + "," + coord1.lng + "|" + coord2.lat + "," + coord2.lng;
     let destinations = "";
-    let distances = [];
+    let originAddresses = [];
+    let destinationAddresses = [];
+    let distanceFromOrigin1 = [];
+    let distanceFromOrigin2 = [];
     for(let i = 0; i < places.length; i++){
         destinations = destinations + places[i].geometry.location.lat + "," + places[i].geometry.location.lng + "|";
         if(i%23 === 0 || i === places.length-1){
@@ -115,14 +115,17 @@ async function getDistances(address1, address2, places){
             try{
                 console.log(url);
                 let response = await Axios.get(url);
-                distances.push(response.data);
+                originAddresses = response.data.origin_addresses;
+                destinationAddresses.push(...response.data.destination_addresses);
+                distanceFromOrigin1.push(...response.data.rows[0].elements);
+                distanceFromOrigin2.push(...response.data.rows[1].elements);
             }catch(err){
                 console.log(err);
             }
             destinations = "";
         }
     }
-    return distances;
+    return {origins: originAddresses, destinations: destinationAddresses, distance_from_origin1: distanceFromOrigin1, distance_from_origin2: distanceFromOrigin2};
 }
 
 function delay(ms) {
