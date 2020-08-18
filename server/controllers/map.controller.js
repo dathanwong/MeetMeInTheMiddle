@@ -22,6 +22,20 @@ module.exports.getPlaces = async (req, res) =>{
     res.json(places);
 }
 
+module.exports.getPhoto = (req, res) =>{
+    const photoReference = req.params.reference;
+    const maxWidth = req.params.width;
+    let url = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=" + maxWidth + "&photoreference=" + photoReference + "&key=" + process.env.GOOGLE_MAPS_API_KEY;
+    Axios.get(url)
+        .then(response => {
+            res.json(response.request.res.responseUrl);
+        })
+        .catch(err =>{
+            console.log(err);
+            res.json(err);
+        })
+}
+
 module.exports.getPotentialPlaces = async(req, res) =>{
     //Set up parameters
     const address1 = req.params.address1;
@@ -50,7 +64,7 @@ module.exports.getPotentialPlaces = async(req, res) =>{
             coord1: coord1,
             coord2: coord2,
             radius: maxDistance,
-            places: filterPlacesByDistance(places, maxDistance)
+            places: filterPlacesByDistance(places)
         }
         res.json(output);
     }catch(err){
@@ -80,7 +94,7 @@ async function getDistance(address1, address2){
 }
 
 //returns a new array with the places that are less than the max distance away from both locations
-function filterPlacesByDistance(places, maxDistance){
+function filterPlacesByDistance(places){
     let output = [];
     const windowSize = 20000;
     for(let i = 0; i < places.length; i++){

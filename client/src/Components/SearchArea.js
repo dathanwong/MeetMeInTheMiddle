@@ -5,7 +5,7 @@ const SearchArea = (props) => {
 
     const {setRadius, setCoord1, setCoord2, address1, address2, setAddress1, setAddress2, setMapCenter, setPlaces} = props;
 
-    const [searchTerm, setSearchTerm] = useState("");
+    const [searchTerm, setSearchTerm] = useState("golf course");
 
     function handleSubmit(e){
         e.preventDefault();
@@ -29,13 +29,13 @@ const SearchArea = (props) => {
         <div className="container">
             <form onSubmit={handleSubmit}>
                 <div className="row">
-                    <input required type="text" placeholder="User1 Address" onChange={ e => setAddress1(e.target.value)} />
+                    <input required type="text" placeholder="User1 Address" onChange={ e => setAddress1(e.target.value)} value={address1} />
                 </div>
                 <div className="row">
-                    <input required type="text" placeholder="User2 Address" onChange={ e => setAddress2(e.target.value)} />
+                    <input required type="text" placeholder="User2 Address" onChange={ e => setAddress2(e.target.value)} value={address2} />
                 </div>
                 <div className="row">
-                    <input required type="text" placeholder="Search Term" onChange={e => setSearchTerm(e.target.value)} />
+                    <input required type="text" placeholder="Search Term" onChange={e => setSearchTerm(e.target.value)} value={searchTerm} />
                 </div>
                 <div className="row">
                     <button className="btn btn-primary" type="submit">Search</button>
