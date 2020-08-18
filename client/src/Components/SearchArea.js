@@ -13,7 +13,7 @@ const SearchArea = (props) => {
         Axios.get(url)
             .then(response =>{
                 console.log(response);
-                setPlaces([...response.data.overlap]);
+                setPlaces([...response.data.places]);
                 setCoord1(response.data.coord1);
                 setCoord2(response.data.coord2);
                 setRadius(response.data.radius);
@@ -22,7 +22,7 @@ const SearchArea = (props) => {
     }
 
     function stringToParam(string){
-        return string.replace(" ", "+");
+        return string.replace(/ /g, '+');
     }
 
     return (
