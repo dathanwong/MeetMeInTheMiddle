@@ -1,5 +1,5 @@
 import React from 'react';
-import {Map, GoogleApiWrapper, Marker, Circle} from 'google-maps-react';
+import {Map, GoogleApiWrapper, Marker, Circle, MarkerWithLabel} from 'google-maps-react';
 
 const mapStyles ={
     width: '100%',
@@ -9,7 +9,6 @@ const mapStyles ={
 const MapContainer = (props) => {
 
     const {coord1, coord2, radius, places, mapCenter} = props;
-
     return ( 
         <Map
             google={props.google}
@@ -60,14 +59,16 @@ const MapContainer = (props) => {
             }
             {
                 places.map((place, index) =>
-                    <Marker
+                {   
+                    return <Marker
                         key={index}
                         title={place.name}
                         position={place.geometry.location} 
                         icon={{
-                            url: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
+                            url: '/images/number_'+(+index+1)+'.png'
                         }}
                     />
+                }
                 )
             }
         </Map>
