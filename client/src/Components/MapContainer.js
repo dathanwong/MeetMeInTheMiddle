@@ -8,14 +8,15 @@ const mapStyles ={
 
 const MapContainer = (props) => {
 
-    const {coord1, coord2, radius, places} = props;
+    const {coord1, coord2, radius, places, mapCenter} = props;
 
     return ( 
         <Map
             google={props.google}
             zoom={10}
             style={mapStyles}
-            initialCenter={props.mapCenter}
+            initialCenter={mapCenter}
+            center={mapCenter}
         >
             {
                 coord1 !== null &&

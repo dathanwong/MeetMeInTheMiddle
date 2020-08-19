@@ -34,7 +34,7 @@ const PlaceInfo = (props) => {
             {
                 photo && 
                 <div className="row">
-                    <img src={photo} alt="location"/>
+                    <img src={photo} alt="location" style={{width:"100%"}}/>
                 </div>
             }
         </div>

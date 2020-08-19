@@ -6,9 +6,11 @@ const SearchArea = (props) => {
     const {setRadius, setCoord1, setCoord2, address1, address2, setAddress1, setAddress2, setMapCenter, setPlaces} = props;
 
     const [searchTerm, setSearchTerm] = useState("golf course");
+    const [loading, setLoading] = useState(false);
 
     function handleSubmit(e){
         e.preventDefault();
+        setLoading(true);
         let url = "http://localhost:8000/api/map/getPotentialPlaces/" + stringToParam(address1) + "/" + stringToParam(address2) + "/" + stringToParam(searchTerm);
         Axios.get(url)
             .then(response =>{
@@ -17,6 +19,8 @@ const SearchArea = (props) => {
                 setCoord1(response.data.coord1);
                 setCoord2(response.data.coord2);
                 setRadius(response.data.radius);
+                setMapCenter(response.data.center);
+                setLoading(false);
             })
             .catch(err => console.log(err));
     }
@@ -38,7 +42,7 @@ const SearchArea = (props) => {
                     <input required type="text" placeholder="Search Term" onChange={e => setSearchTerm(e.target.value)} value={searchTerm} />
                 </div>
                 <div className="row">
-                    <button className="btn btn-primary" type="submit">Search</button>
+                    <button disabled={loading} className="btn btn-primary" type="submit">{loading ? "Loading..." : "Submit"}</button>
                 </div>
             </form>
         </div> 

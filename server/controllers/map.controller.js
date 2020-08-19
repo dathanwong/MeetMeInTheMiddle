@@ -48,8 +48,9 @@ module.exports.getPotentialPlaces = async(req, res) =>{
         let coord1 = await getGeocode(address1);
         let coord2 = await getGeocode(address2);
         let radius = 20000;
+        let center = getCenterCoord(coord1, coord2);
         //Get all places in radius of the center point between addresses
-        let places = await getPlaces(getCenterCoord(coord1, coord2), radius, keyword);
+        let places = await getPlaces(center, radius, keyword);
         //Get the distances to all the potential places from each address
         let distances = await getDistances(coord1, coord2, places);
         //Combine places with distances into one object
@@ -64,7 +65,8 @@ module.exports.getPotentialPlaces = async(req, res) =>{
             coord1: coord1,
             coord2: coord2,
             radius: maxDistance,
-            places: filterPlacesByDistance(places)
+            places: filterPlacesByDistance(places),
+            center: center
         }
         res.json(output);
     }catch(err){
