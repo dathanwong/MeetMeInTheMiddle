@@ -26,12 +26,12 @@ const Main = (props) => {
                         
                     
                 </div>
-                <div className="col-3">
+                <div className="col-4">
                     <div className="container">
                         {
                             places.map((place, index) =>
-                                <div className="row">
-                                    <PlaceInfo place={place} key={index} />
+                                <div className="row my-2">
+                                    <PlaceInfo place={place} key={index} index={index} />
                                 </div>
                             )
                         }

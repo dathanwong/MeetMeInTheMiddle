@@ -32,26 +32,26 @@ const SearchArea = (props) => {
     return (
         <div className="container">
             <form onSubmit={handleSubmit}>
-                <div className="row input-group">
+                <div className="row input-group my-2">
                     <div className="input-group-prepend">
                         <span className="input-group-text">Enter first address:</span> 
                     </div>
                     <input className="form-control" required type="text" placeholder="User1 Address" onChange={ e => setAddress1(e.target.value)} value={address1} />
                 </div>
-                <div className="row input-group">
+                <div className="row input-group my-2">
                     <div className="input-group-prepend">
                         <span className="input-group-text">Enter second address:</span> 
                     </div>
                     <input className="form-control" required type="text" placeholder="User2 Address" onChange={ e => setAddress2(e.target.value)} value={address2} />
                 </div>
-                <div className="row input-group">
+                <div className="row input-group my-2">
                     <div className="input-group-prepend">
                         <span className="input-group-text">Enter search term:</span> 
                     </div>
                     <input className="form-control" required type="text" placeholder="Search Term" onChange={e => setSearchTerm(e.target.value)} value={searchTerm} />
                 </div>
-                <div className="row">
-                    <button disabled={loading} className="btn btn-primary" type="submit">{loading ? "Loading..." : "Search"}</button>
+                <div className="row my-2">
+                    <button disabled={loading} className="col mx-5 btn btn-primary" type="submit">{loading ? "Loading..." : "Search"}</button>
                 </div>
             </form>
         </div> 

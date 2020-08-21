@@ -4,7 +4,7 @@ import Axios from 'axios';
 const PlaceInfo = (props) => {
 
     const [photo, setPhoto] = useState(null);
-    const {place} = props;
+    const {place, index} = props;
 
     useEffect(() =>{
         const picWidth = 150;
@@ -21,20 +21,29 @@ const PlaceInfo = (props) => {
     }, [place])
 
     return ( 
-        <div className="container border border-dark">
+        <div className="container border border-dark p-2" style={{borderRadius:"10%"}} >
             <div className="row">
-                {place.name}
+                <div className="col">
+                    {index+1+"."} {place.name}
+                </div>
             </div>
             <div className="row">
-                Distance from address 1: {place.distance_from_origin1.distance.text}
+                <div className="col">
+                    Distance from address 1: {place.distance_from_origin1.distance.text}
+                </div>
             </div>
             <div className="row">
-                Distance from address 2: {place.distance_from_origin2.distance.text}
+                <div className="col">
+                    Distance from address 2: {place.distance_from_origin2.distance.text}
+                </div>
+                
             </div>
             {
                 photo && 
                 <div className="row">
-                    <img src={photo} alt="location" style={{width:"100%"}}/>
+                    <div className="col">
+                        <img src={photo} alt="location" style={{width:"100%", borderRadius:"10%"}}/>
+                    </div>
                 </div>
             }
         </div>
